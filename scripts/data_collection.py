@@ -32,12 +32,14 @@ def fetch_google_books_data(title, author, api_key=None):
                     "description": book_info.get("description"),
                     "publishedDate": book_info.get("publishedDate"),
                     "categories": book_info.get("categories"),
-                    "pageCount": book_info.get("pageCount")
+                    "pageCount": book_info.get("pageCount"),
+                    "averageRating": book_info.get("averageRating")  # ✅ New line here!
                 }
     except Exception as e:
         print(f"Error fetching data for {title}: {e}")
 
     return {}
+
 
 # Optional: Goodreads scraper (if you want to scrape missing info)
 def scrape_goodreads_description(goodreads_url):
