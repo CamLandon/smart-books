@@ -16,7 +16,7 @@ import pickle
 
 # Step 1: Load the cleaned dataset
 print("📚 Loading cleaned book dataset...")
-books_df = pd.read_csv('../data/books_dataset_cleaned.csv')
+books_df = pd.read_csv('../data/books_dataset_cleaned.csv', on_bad_lines='skip', engine='python')
 
 # Step 2: Combine text fields into one "combined_features" column
 print("🧩 Combining important fields (title, author, description, categories)...")
