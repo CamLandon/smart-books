@@ -2,50 +2,45 @@
 
 """
 Data Collection Script for Smart Book Discoveries
-- Fetch book data from Goodreads and Google Books APIs
-- Perform basic web scraping for missing information
+- Fetch book data from Google Books API for thousands of books
+- Save updated dataset with additional fields
 """
 
 import requests
 import pandas as pd
-from bs4 import BeautifulSoup
 import time
+from bs4 import BeautifulSoup
 
-# Example 1: Collecting book details from a CSV dataset
+# Load initial book dataset
 def load_csv_dataset(filepath):
-    """
-    Load initial book dataset from a CSV file.
-    """
     return pd.read_csv(filepath)
 
-# Example 2: Google Books API function
+# Google Books API fetch function
 def fetch_google_books_data(title, author, api_key=None):
-    """
-    Search for a book on Google Books API based on title and author.
-    """
     query = f"{title}+inauthor:{author}"
     url = f"https://www.googleapis.com/books/v1/volumes?q={query}"
     if api_key:
         url += f"&key={api_key}"
-    
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
-        if "items" in data:
-            book_info = data["items"][0]["volumeInfo"]
-            return {
-                "description": book_info.get("description"),
-                "publishedDate": book_info.get("publishedDate"),
-                "categories": book_info.get("categories"),
-                "pageCount": book_info.get("pageCount")
-            }
+
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
+            if "items" in data:
+                book_info = data["items"][0]["volumeInfo"]
+                return {
+                    "description": book_info.get("description"),
+                    "publishedDate": book_info.get("publishedDate"),
+                    "categories": book_info.get("categories"),
+                    "pageCount": book_info.get("pageCount")
+                }
+    except Exception as e:
+        print(f"Error fetching data for {title}: {e}")
+
     return {}
 
-# Example 3: Simple web scraping using BeautifulSoup
+# Optional: Goodreads scraper (if you want to scrape missing info)
 def scrape_goodreads_description(goodreads_url):
-    """
-    Scrape book description from a Goodreads page.
-    """
     headers = {'User-Agent': 'Mozilla/5.0'}
     response = requests.get(goodreads_url, headers=headers)
     if response.status_code == 200:
@@ -57,23 +52,40 @@ def scrape_goodreads_description(goodreads_url):
                 return spans[-1].get_text(strip=True)
     return None
 
-# Example usage:
+# Main workflow
 if __name__ == "__main__":
-    # Load initial dataset
+    # 1. Load your dataset
     books_df = load_csv_dataset('../data/books_dataset.csv')
 
-    # Sample API call for one book
-    sample_title = "The Night Circus"
-    sample_author = "Erin Morgenstern"
-    google_data = fetch_google_books_data(sample_title, sample_author)
+    # Add new empty columns to hold fetched data if they don't exist
+    for col in ['description', 'publishedDate', 'categories', 'pageCount']:
+        if col not in books_df.columns:
+            books_df[col] = None
 
-    print("Fetched Google Books API Data:")
-    print(google_data)
+    # 2. Loop through each book
+    for idx, row in books_df.iterrows():
+        title = row['title']
+        author = row['author']
 
-    # (Optional) Sample scrape if Goodreads URL is available
-    # goodreads_url = "https://www.goodreads.com/book/show/9361589-the-night-circus"
-    # description = scrape_goodreads_description(goodreads_url)
-    # print("Scraped Goodreads Description:")
-    # print(description)
+        # Skip if already filled (optional, for reruns)
+        if pd.notna(row.get('description')):
+            continue
 
-    # Note: You would typically loop through your dataset and update missing fields
+        print(f"Fetching data for: {title} by {author}")
+
+        # Fetch from Google Books
+        google_data = fetch_google_books_data(title, author)
+
+        # Update dataset
+        books_df.at[idx, 'description'] = google_data.get('description')
+        books_df.at[idx, 'publishedDate'] = google_data.get('publishedDate')
+        books_df.at[idx, 'categories'] = google_data.get('categories')
+        books_df.at[idx, 'pageCount'] = google_data.get('pageCount')
+
+        # Wait 1 second between API calls to be polite
+        time.sleep(1)
+
+    # 3. Save updated dataset
+    books_df.to_csv('../data/books_dataset_updated.csv', index=False)
+
+    print("✅ Data collection completed and saved to 'books_dataset_updated.csv'")
