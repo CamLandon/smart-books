@@ -20,4 +20,33 @@ The project combines data collection, exploration, modeling, and evaluation into
 ---
 
 ## Project Structure
+smart-books/ 
+├── data/ # Raw and cleaned datasets 
+├── notebooks/ # Jupyter notebooks for EDA, modeling, testing 
+├── scripts/ # Python scripts (e.g., data processing, modeling) 
+├── figures/ # Charts, graphs, heatmaps, visual outputs 
+├── reports/ # LaTeX files for Overleaf report writing ├── README.md # Project description and instructions 
+├── .gitignore # Files and folders to exclude from GitHub 
+├── requirements.txt # List of required Python packages
 
+
+## Setup Instructions
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/CamLandon/smart-books.git
+   cd smart-books
+
+2. **Set up virtual environment**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows use: venv\Scripts\activate
+
+3. **Install Dependencies**
+    ```bash
+    pip install -r requirements.txt   
+
+
+4. **Launch Juypyter Notebooks**
+    ```bash
+    jupyter notebooks
