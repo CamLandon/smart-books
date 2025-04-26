@@ -20,13 +20,22 @@ The project combines data collection, exploration, modeling, and evaluation into
 ---
 
 ## Project Structure
-smart-books/ 
+smart-books/
+
 ├── data/ # Raw and cleaned datasets 
+
 ├── notebooks/ # Jupyter notebooks for EDA, modeling, testing 
+
 ├── scripts/ # Python scripts (e.g., data processing, modeling) 
+
 ├── figures/ # Charts, graphs, heatmaps, visual outputs 
-├── reports/ # LaTeX files for Overleaf report writing ├── README.md # Project description and instructions 
-├── .gitignore # Files and folders to exclude from GitHub 
+
+├── reports/ # LaTeX files for Overleaf report writing 
+
+├── README.md # Project description and instructions 
+
+├── .gitignore # Files and folders to exclude from GitHub
+
 ├── requirements.txt # List of required Python packages
 
 
