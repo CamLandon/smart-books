@@ -19,7 +19,12 @@ env/
 .vscode/
 
 # Project-specific folders (large files or generated outputs)
-data/
+# Ignore everything in data folder
+/data/*
+# BUT allow these two CSVs:
+!/data/books_dataset.csv
+!/data/books_dataset_cleaned.csv
+
 figures/
 reports/
 
