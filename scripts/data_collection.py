@@ -1,4 +1,4 @@
-# src/data_collection.py
+# scripts/data_collection.py
 
 """
 Data Collection Script for Smart Book Discoveries
@@ -33,15 +33,14 @@ def fetch_google_books_data(title, author, api_key=None):
                     "publishedDate": book_info.get("publishedDate"),
                     "categories": book_info.get("categories"),
                     "pageCount": book_info.get("pageCount"),
-                    "averageRating": book_info.get("averageRating")  # ✅ New line here!
+                    "averageRating": book_info.get("averageRating")  # ✅ Now collecting rating too!
                 }
     except Exception as e:
         print(f"Error fetching data for {title}: {e}")
 
     return {}
 
-
-# Optional: Goodreads scraper (if you want to scrape missing info)
+# Optional: Goodreads scraper (if you want to scrape missing descriptions)
 def scrape_goodreads_description(goodreads_url):
     headers = {'User-Agent': 'Mozilla/5.0'}
     response = requests.get(goodreads_url, headers=headers)
@@ -56,11 +55,11 @@ def scrape_goodreads_description(goodreads_url):
 
 # Main workflow
 if __name__ == "__main__":
-    # 1. Load your dataset
+    # 1. Load your original dataset
     books_df = load_csv_dataset('../data/books_dataset.csv')
 
-    # Add new empty columns to hold fetched data if they don't exist
-    for col in ['description', 'publishedDate', 'categories', 'pageCount']:
+    # Add new empty columns if they don't exist
+    for col in ['description', 'publishedDate', 'categories', 'pageCount', 'averageRating']:
         if col not in books_df.columns:
             books_df[col] = None
 
@@ -69,7 +68,7 @@ if __name__ == "__main__":
         title = row['title']
         author = row['author']
 
-        # Skip if already filled (optional, for reruns)
+        # Skip already fetched books (optional)
         if pd.notna(row.get('description')):
             continue
 
@@ -78,13 +77,14 @@ if __name__ == "__main__":
         # Fetch from Google Books
         google_data = fetch_google_books_data(title, author)
 
-        # Update dataset
+        # Update the dataset
         books_df.at[idx, 'description'] = google_data.get('description')
         books_df.at[idx, 'publishedDate'] = google_data.get('publishedDate')
         books_df.at[idx, 'categories'] = google_data.get('categories')
         books_df.at[idx, 'pageCount'] = google_data.get('pageCount')
+        books_df.at[idx, 'averageRating'] = google_data.get('averageRating')
 
-        # Wait 1 second between API calls to be polite
+        # Wait politely between API calls
         time.sleep(1)
 
     # 3. Save updated dataset

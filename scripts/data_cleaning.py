@@ -20,13 +20,18 @@ print("🧹 Cleaning data...")
 books_df.drop_duplicates(inplace=True)
 
 # 2.2 Remove books missing important fields
-# (You can decide which ones are absolutely necessary — here we'll use title, author, and description)
+# (We'll require title, author, and description to exist)
 required_columns = ['title', 'author', 'description']
 books_df.dropna(subset=required_columns, inplace=True)
 
-# 2.3 Fill missing numeric values with 0 (e.g., pageCount if needed)
+# 2.3 Fill missing numeric values
+# (Page count and average rating)
+
 if 'pageCount' in books_df.columns:
     books_df['pageCount'].fillna(0, inplace=True)
+
+if 'averageRating' in books_df.columns:
+    books_df['averageRating'].fillna(0, inplace=True)   # ✅ NEW LINE TO ADD
 
 # 2.4 Standardize text columns (remove leading/trailing spaces)
 text_columns = ['title', 'author', 'description', 'categories']
@@ -34,7 +39,7 @@ for col in text_columns:
     if col in books_df.columns:
         books_df[col] = books_df[col].astype(str).str.strip()
 
-# 2.5 (Optional) If categories is a list or weird format, convert to simple text
+# 2.5 (Optional) Clean up categories
 def clean_categories(cat):
     if isinstance(cat, list) or isinstance(cat, dict):
         return ', '.join(cat)  # flatten lists
